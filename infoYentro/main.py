@@ -126,6 +126,8 @@ def main(instancia=None, operacion=''):
     else:
         datos, tipo_operacion = data_input()
 
+    print('---> Instancia cargada:\n{}'.format(datos))
+
     cantidad_datos = 1
     for i in datos.shape:
         cantidad_datos *= i
