@@ -16,6 +16,9 @@ def informacion_mutua(datos, operacion, es_matriz=False):
     if es_matriz:
         datos = np.array(datos).flatten()
 
+    # Excluye los ceros del array.
+    datos = datos[datos != 0]
+
     # Se obtiene cual es el operdor del logaritmo a usar.
     if operacion is Tipo_Operacion.CUANTIFICABLE:
         log = np.log10
@@ -26,23 +29,9 @@ def informacion_mutua(datos, operacion, es_matriz=False):
     else:
         raise Exception('El tipo de operación no es valido')
 
-    # Se crea un nuevo array con los datos calculados.
-    ie = np.zeros(shape=datos.shape, dtype=float)
-
-    barra = Bar(
-        '---| Procesando información mutua... ',
-        max=datos.shape[0],
-        suffix='%(percent)d%%'
-    )
-
-    # Por cada elemento, se calcula el logaritmo de base n.
-    i = 0
-    while i < datos.shape[0]:
-        if datos[i] != 0:
-            ie[i] = -log(datos[i])
-        i += 1
-        barra.next()
-    barra.finish()
+    print('---| Procesando información mutua... ')
+    ie = -log(datos)
+    print('---> Terminado ')
 
     return np.sum(ie), ie
 
@@ -53,25 +42,13 @@ def entropia(datos, operacion, es_matriz=False):
     if es_matriz:
         datos = np.array(datos).flatten()
 
+    # Excluye los ceros del array.
+    datos = datos[datos != 0]
+
     sum_ie, ie = informacion_mutua(datos, operacion)
 
-    # Se crea un nuevo array con los datos calculados.
-    he = np.zeros(shape=datos.shape, dtype=float)
-
-    barra = Bar(
-        '---| Procesando entropia... ',
-        max=datos.shape[0],
-        suffix='%(percent)d%%'
-    )
-
-    # Por cada elemento, se calcula el logaritmo de base n.
-    i = 0
-    while i < datos.shape[0]:
-        im = ie[i]
-        pe = datos[i]
-        he[i] = pe * im
-        i += 1
-        barra.next()
-    barra.finish()
+    print('---| Procesando entropia... ')
+    he = datos * ie
+    print('---> Terminado ')
 
     return np.sum(he), he, sum_ie, ie
