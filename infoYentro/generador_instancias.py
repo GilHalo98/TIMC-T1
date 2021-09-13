@@ -16,6 +16,7 @@
 import sys
 import pickle
 import datetime
+import time
 
 # Librerias de tercer
 import numpy as np
@@ -23,8 +24,11 @@ import numpy as np
 # Librerias propias.
 from util.constantes import Tipo_Operacion
 
+
 # Funcion main.
 def main(tipo_operacion, dimenciones, archivo_salida=''):
+    a = time.perf_counter()
+
     # Asignamos una semilla.
     np.random.seed(0)
 
@@ -42,11 +46,11 @@ def main(tipo_operacion, dimenciones, archivo_salida=''):
 
     # Se verifica el tipo de operacion.
     if tipo_operacion == 'cuantificable':
-         tipo_operacion = Tipo_Operacion.CUANTIFICABLE
+        tipo_operacion = Tipo_Operacion.CUANTIFICABLE
     elif tipo_operacion == 'datos':
-         tipo_operacion = Tipo_Operacion.TRANSMISION_DATOS
+        tipo_operacion = Tipo_Operacion.TRANSMISION_DATOS
     elif tipo_operacion == 'estados':
-         tipo_operacion = Tipo_Operacion.TRANSICION_ESTADOS
+        tipo_operacion = Tipo_Operacion.TRANSICION_ESTADOS
     else:
         raise Exception(
             'El tipo de operación {} no es valido'.format(tipo_operacion)
@@ -75,6 +79,14 @@ def main(tipo_operacion, dimenciones, archivo_salida=''):
 
     # Cerrando el objeto archivo
     fichero.close()
+
+    b = time.perf_counter()
+
+    mensaje = '---> El archivo {} fue creado exitosamente'.format(
+        archivo_salida
+    )
+    mensaje += ' en {0:.4f}s'.format(b - a)
+    print(mensaje)
 
 
 if __name__ == "__main__":
