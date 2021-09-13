@@ -20,5 +20,5 @@ class AutoName(Enum):
 # Tipos de operaciones.
 class Tipo_Operacion(AutoName):
     CUANTIFICABLE = auto()
-    TANSMISION_DATOS = auto()
-    TRANSISION_ESTADOS = auto()
+    TRANSMISION_DATOS = auto()
+    TRANSICION_ESTADOS = auto()
