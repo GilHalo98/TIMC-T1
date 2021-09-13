@@ -7,7 +7,6 @@ import numpy as np
 
 # Librerias propias.
 from util.constantes import Tipo_Operacion
-from progress.bar import Bar
 
 
 # Calcula la informaicon mutua de un conjunto
@@ -18,6 +17,7 @@ def informacion_mutua(datos, operacion, es_matriz=False):
 
     # Excluye los ceros del array.
     datos = datos[datos != 0]
+    datos = datos[datos != -1]
 
     # Se obtiene cual es el operdor del logaritmo a usar.
     if operacion is Tipo_Operacion.CUANTIFICABLE:
@@ -44,6 +44,7 @@ def entropia(datos, operacion, es_matriz=False):
 
     # Excluye los ceros del array.
     datos = datos[datos != 0]
+    datos = datos[datos != -1]
 
     sum_ie, ie = informacion_mutua(datos, operacion)
 
