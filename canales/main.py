@@ -8,6 +8,7 @@
 
 
 # Librerias estandar.
+import io
 import sys
 from os import system
 
@@ -21,17 +22,23 @@ from grafo.arbol_combinaciones import Arbol_Combinaciones
 # Funcion main.
 def main():
     system('clear')
-    # A = ['#', '$', '%', '!', '"']
-    B = ['!', '##', '$$', '"""', '%%%%']
+    # C = ['0', '1', '*']
+    # C = ['0000', '1111']
+    # C = ['#', '$', '%', '!', '"']
+    C = ['!', '##', '$$', '"""', '%%%%']
     arbol = Arbol_Combinaciones()
-    arbol.generar_combinaciones(B, 5)
-    for nodo in arbol.topologia.values():
-        print(nodo)
-    print()
+    arbol.generar_combinaciones(C, 4)
 
-    combinaciones = arbol.dfs()
-    for combinacion in combinaciones:
-        print(combinacion)
+    print(arbol)
+
+    combinaciones = ''
+    for combinacion in arbol.combinaciones():
+        combinaciones += combinacion
+        combinaciones += '\n'
+
+    archivo = open('prueba.txt', 'w')
+    archivo.write(combinaciones)
+    archivo.close()
 
 
 if __name__ == "__main__":
