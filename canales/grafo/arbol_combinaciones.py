@@ -29,10 +29,61 @@ class Arbol_Combinaciones(object):
         self.__id = 1
 
         # Total de combinaciones en el arbol.
-        self.combinaciones = 0
+        self.total_combinaciones = 0
 
         # Total de nodos en el arbol.
         self.total_nodos = 1
+
+    def __str__(self):
+        recorrido = self.recorrido_preorden()
+
+        _, nodo = next(recorrido)
+
+        arbol = ['{}\n'.format(nodo.id_nodo)]
+
+        nivel_anterior = 0
+        nodo_anterior = None
+        for nivel, nodo in recorrido:
+            representacion = ''
+
+            for _ in range(nivel - 1):
+                representacion += '║  '
+
+            if nivel == nivel_anterior:
+                if not nodo.es_hoja():
+                    representacion += '╠═'
+                else:
+                    representacion += '╠═'
+
+            else:
+                if nivel > nivel_anterior:
+                    if nodo.es_hoja():
+                        representacion += '╠═'
+                    else:
+                        representacion += '╠═'
+                else:
+                    representacion += '╠═'
+
+                    salto = ''
+                    for _ in range(nivel_anterior - 1):
+                        salto += '║  '
+                    arbol[-1] = '{}╚═ {}\n'.format(
+                        salto,
+                        nodo_anterior.contenido
+                    )
+
+            representacion += ' {}\n'.format(nodo.contenido)
+
+            arbol.append(representacion)
+            nivel_anterior = nivel
+            nodo_anterior = nodo
+
+        mensaje = ''.join(arbol)
+        mensaje += '\nTotal de nodos: {}'.format(self.total_nodos)
+        mensaje += '\nTotal de combionaciones encontradas: {}'.format(
+            self.total_combinaciones
+        )
+        return mensaje
 
     def __reset_topologia(self):
         # Al generar un nuevo arbol de combinaciones, resetea la
@@ -44,7 +95,7 @@ class Arbol_Combinaciones(object):
         }
 
         self.__id = 1
-        self.combinaciones = 0
+        self.total_combinaciones = 0
         self.total_nodos = 1
 
     def __validar_datos(self, caracteres, longitud_canal):
@@ -145,7 +196,7 @@ class Arbol_Combinaciones(object):
             else:
                 # Si no hay nodos en la expacion, eso quiere decir que
                 # encontro una hoja.
-                self.combinaciones += 1
+                self.total_combinaciones += 1
 
             # Si ya no hay nodos en la frontera, termina el algoritmo.
             if len(frontera) <= 0:
@@ -155,7 +206,7 @@ class Arbol_Combinaciones(object):
         # satisfactoriamente.
         return True
 
-    def dfs(self):
+    def combinaciones(self):
         # Se mantiene una frontera de exploracion.
         visitados = []
 
@@ -164,9 +215,6 @@ class Arbol_Combinaciones(object):
 
         # El id en el que se encuentra actualmente, empieza por la raiz.
         id_nodo_actual = self.id_raiz
-
-        # Almacenamos las combinaciones.
-        combinaciones = []
 
         # Mientras que la cantidad de nodos visitados sea menor que
         # la cantidad de nodos en el arbol.
@@ -182,7 +230,7 @@ class Arbol_Combinaciones(object):
                     self.topologia[id].contenido for id in ruta.copy()
                 ]
                 combinacion += [self.topologia[id_nodo_actual].contenido]
-                combinaciones.append(''.join(combinacion))
+                yield ''.join(combinacion)
 
                 id_nodo_actual = ruta.pop()
             else:
@@ -203,4 +251,76 @@ class Arbol_Combinaciones(object):
                     # Se mueve al nodo hijo seleccionado.
                     id_nodo_actual = id_no_visitado
 
-        return combinaciones
+    def nodos_por_nivel(self):
+        # Retorna una lista que contiene todos los nodos por nivel visitado.
+        nivel = 0  # Nivel en el que se encuentra.
+        visitados = 0  # La cantidad de nodos visitados.
+        nodos = [self.id_raiz]  # Los id de los nodos en el nivel actual.
+
+        # Mientras que los nodos visitados sean menor que la cantidad total
+        # de nodos en el arbol.
+        while visitados < self.total_nodos:
+            yield nivel, [
+                self.topologia[nodo] for nodo in nodos
+            ]  # Retorna los nodos por nivel.
+
+            # La expancion son los nodos encontrados por nivel.
+            expancion = []
+
+            # Mientras que haya nodos que falten visitar.
+            while len(nodos) > 0:
+                # Remueve el ultimo id agregado, esto es una cola.
+                id_nodo = nodos.pop(0)
+
+                # Aumenta en uno la cantidad de nodos visitados.
+                visitados += 1
+
+                # Se agregan los hijos de dicho nodo a la expancion.
+                expancion += self.topologia[id_nodo].hijos
+
+            # La expancion se agrega a la cola.
+            nodos += expancion
+
+            # Vajamos un nivel en el arbol.
+            nivel += 1
+
+    def recorrido_preorden(self):
+        # Nodos marcados como visitados.
+        visitados = []
+
+        # Id del nodo en el que se encuentra actualmente.
+        id_nodo = self.id_raiz
+
+        # El nivel del arbol en el que se encuentra el recorrido.
+        nivel = 0
+
+        # Mientras que la cantidad de nodos visitados sea menor a la del
+        # total de nodos en el arbol.
+        while len(visitados) < self.total_nodos:
+            # Si el nodo no esta marcado como visitado.
+            if id_nodo not in visitados:
+                # Marcamos el nodo como visitado.
+                visitados.append(id_nodo)
+
+                # Y retorna el nodo en el que nos encontramos.
+                yield nivel, self.topologia[id_nodo]
+
+            # Verificamos si el nodo en el que nos encontramos es hoja.
+            if self.topologia[id_nodo].es_hoja():
+                # Si es asi, retornamos un nodo.
+                id_nodo = self.topologia[id_nodo].padre
+                nivel -= 1
+            else:
+                # Si no es asi, se mueve a un hijo no visitado.
+                nuevo_nodo = False
+                for id_hijo in self.topologia[id_nodo].hijos:
+                    if id_hijo not in visitados:
+                        id_nodo = id_hijo
+                        nuevo_nodo = True
+                        nivel += 1
+                        break
+
+                # Si todos los nodos ya fueron visitados, se regresa un nodo.
+                if not nuevo_nodo:
+                    id_nodo = self.topologia[id_nodo].padre
+                    nivel -= 1
