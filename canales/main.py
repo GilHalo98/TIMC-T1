@@ -8,12 +8,10 @@
 
 
 # Librerias estandar.
-import io
 import sys
 from os import system
 
 # Librerias de tercer
-# import numpy as np
 
 # Propias.
 from grafo.arbol_combinaciones import Arbol_Combinaciones
@@ -27,7 +25,7 @@ def main():
     # C = ['#', '$', '%', '!', '"']
     C = ['!', '##', '$$', '"""', '%%%%']
     arbol = Arbol_Combinaciones()
-    arbol.generar_combinaciones(C, 4)
+    arbol.generar_combinaciones(C, 10)
 
     print(arbol)
 
@@ -36,9 +34,7 @@ def main():
         combinaciones += combinacion
         combinaciones += '\n'
 
-    archivo = open('prueba.txt', 'w')
-    archivo.write(combinaciones)
-    archivo.close()
+    arbol.graficar('prueba')
 
 
 if __name__ == "__main__":

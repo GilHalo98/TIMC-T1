@@ -4,6 +4,9 @@
 """
 
 
+# Librerias de terceros.
+from graphviz import Digraph
+
 # Dependencias.
 from grafo.nodo import Nodo
 
@@ -324,3 +327,24 @@ class Arbol_Combinaciones(object):
                 if not nuevo_nodo:
                     id_nodo = self.topologia[id_nodo].padre
                     nivel -= 1
+
+    def graficar(self, archivo):
+        grafico = Digraph(comment='Test', format='svg')
+
+        for nodo_padre in list(self.topologia.values()):
+            grafico.node(
+                str(nodo_padre.id_nodo),
+                nodo_padre.contenido
+            )
+
+            for id_hijo, costo in zip(
+                self.topologia[nodo_padre.id_nodo].hijos,
+                self.topologia[nodo_padre.id_nodo].costos
+            ):
+                grafico.edge(
+                    str(nodo_padre.id_nodo),
+                    str(id_hijo),
+                    str(costo),
+                )
+
+        grafico.render(filename=archivo)
