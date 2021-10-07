@@ -1,0 +1,41 @@
+// Test
+graph {
+	q4 [label="q4
+1.0"]
+	q4 -- q3 [label=0]
+	q4 -- q2 [label=1]
+	q3 [label="q3
+0.6"]
+	q3 -- q1 [label=0]
+	q3 -- s1 [label=1]
+	q2 [label="q2
+0.4"]
+	q2 -- s3 [label=0]
+	q2 -- s2 [label=1]
+	q1 [label="q1
+0.35"]
+	q1 -- q0 [label=0]
+	q1 -- s4 [label=1]
+	q0 [label="q0
+0.2"]
+	q0 -- s5 [label=0]
+	q0 -- s6 [label=1]
+	s6 [label="s6
+$$
+0.08"]
+	s5 [label="s5
+!!
+0.12"]
+	s4 [label="s4
+%%%%
+0.15"]
+	s3 [label="s3
+###
+0.2"]
+	s2 [label="s2
+\"\"
+0.2"]
+	s1 [label="s1
+!
+0.25"]
+}
