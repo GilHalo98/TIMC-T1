@@ -44,6 +44,9 @@ class Nodo(object):
             self.hijo_derecha,
         )
 
+    def get_hijos(self):
+        return [self.hijo_izquierda, self.hijo_derecha]
+
     def es_hoja(self):
         if self.hijo_izquierda is None and self.hijo_derecha is None:
             return True
