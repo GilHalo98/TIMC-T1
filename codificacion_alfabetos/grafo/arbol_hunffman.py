@@ -147,7 +147,7 @@ class Arbol_Hunffman(object):
                 # Se agrega el nodo en el grafico.
                 grafico.node(
                     str(nodo.id_nodo),
-                    str('{0:.2f}'.format(float(nodo.contenido)))
+                    str('{}'.format(nodo.contenido))
                 )
 
                 # Hijo de la izquierda.
@@ -168,7 +168,7 @@ class Arbol_Hunffman(object):
                 contenido = '{{'
                 contenido += self.diccionario[nodo.id_nodo]
                 contenido += ' | '
-                contenido += str('{0:.2f}'.format(float(nodo.contenido)))
+                contenido += str('{}'.format(nodo.contenido))
                 contenido += ' } | '
                 contenido += codificacion[nodo.id_nodo] + ' }'
 
@@ -236,3 +236,29 @@ class Arbol_Hunffman(object):
             texto_encriptado += self.diccionario_codigos[c]
 
         return texto_encriptado
+
+    # Desencripta un texto dado con el arbol de Huffman.
+    def desencriptar(self, texto_encriptado):
+        nodo_acutal = self.id_raiz
+        texto = ''
+        combinacion = ''
+
+        n = len(texto_encriptado)
+        i = 0
+
+        while i < n:
+            if self.topologia[nodo_acutal].es_hoja():
+                texto += self.diccionario[nodo_acutal]
+                nodo_acutal = self.id_raiz
+            else:
+                bit = texto_encriptado[i]
+                combinacion += bit
+                if bit == '1':
+                    nodo_acutal = self.topologia[nodo_acutal].hijo_derecha
+                else:
+                    nodo_acutal = self.topologia[nodo_acutal].hijo_izquierda
+                i += 1
+
+        texto += self.diccionario[nodo_acutal]
+
+        return texto

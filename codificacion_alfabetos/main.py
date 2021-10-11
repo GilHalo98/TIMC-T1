@@ -10,9 +10,10 @@
 
 # Librerias estandar.
 import sys
-from os import system
-import fractions
 import random
+import fractions
+from os import system
+from requests import get
 
 # Libreria propia
 from grafo.arbol_hunffman import Arbol_Hunffman
@@ -22,7 +23,9 @@ from grafo.arbol_hunffman import Arbol_Hunffman
 def generar_texto_aleatorio(longitud):
     texto = ''
 
-    caracteres = [c for c in 'abcdefghijklmnopqrstuvwxyz']
+    caracteres = [
+        c for c in 'abcdefghijklmnñopqrstuvwxyz'
+    ]
 
     for _ in range(longitud):
         texto += random.choice(caracteres)
@@ -55,14 +58,29 @@ def calcular_frecuencias(texto):
 def main():
     system('clear')
 
-    texto = generar_texto_aleatorio(100)
-    texto = 'bvxeoxxfiifrudwjsbmeburkquieftbfdceyeuwcmnfumgvoruyrosynfisjmuxbioxyxxvrtqyqoohwgbeswjxliirotfvwpul'
-    print('Texto generado: {}\n'.format(texto))
+    try:
+        req = get('https://loripsum.net/api/10/verylong/plaintext')
+
+        texto = ''
+        for r in req:
+            texto += r.decode('utf-8')
+
+    except Exception:
+        texto = generar_texto_aleatorio(100)
+
+    print('Texto generado:\n{}\n'.format(texto))
 
     frecuencias, diccionario = calcular_frecuencias(texto)
 
     for id in diccionario:
-        print(id, diccionario[id], frecuencias[id])
+        c = diccionario[id]
+
+        if c == '\n':
+            c = 'NUEVA LINEA'
+        elif c == ' ':
+            c = 'ESPACIO'
+
+        print(id, c, frecuencias[id])
 
     arbol = Arbol_Hunffman()
     arbol.diccionario = diccionario
@@ -71,12 +89,23 @@ def main():
 
     print()
     for codigo in arbol.codigos():
-        print(diccionario[codigo[0]], codigo[1])
+        c = diccionario[codigo[0]]
+
+        if c == '\n':
+            c = 'NUEVA LINEA'
+        elif c == ' ':
+            c = 'ESPACIO'
+
+        print(c, codigo[1])
 
     texto_encriptado = arbol.encriptar(texto)
 
     print()
-    print(texto_encriptado)
+    print('Texto encriptado:\n{}\n'.format(texto_encriptado))
+    print()
+
+    texto_desencriptado = arbol.desencriptar(texto_encriptado)
+    print('Texto desencriptado:\n{}\n'.format(texto_desencriptado))
 
 
 if __name__ == "__main__":
