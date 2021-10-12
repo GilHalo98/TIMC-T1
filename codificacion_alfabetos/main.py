@@ -59,7 +59,8 @@ def main():
     system('clear')
 
     try:
-        req = get('https://loripsum.net/api/10/verylong/plaintext')
+        # req = get('https://loripsum.net/api/10/verylong/plaintext')
+        req = get('https://loripsum.net/api/1/short/plaintext')
 
         texto = ''
         for r in req:
@@ -82,8 +83,7 @@ def main():
 
         print(id, c, frecuencias[id])
 
-    arbol = Arbol_Hunffman()
-    arbol.diccionario = diccionario
+    arbol = Arbol_Hunffman(diccionario)
     arbol.generar_arbol(frecuencias)
     arbol.graficar('prueba')
 
