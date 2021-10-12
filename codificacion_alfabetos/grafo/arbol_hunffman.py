@@ -13,10 +13,18 @@ from graphviz import Graph
 class Arbol_Hunffman(object):
     """
         Arbol binario extendido para usarse como un arbol de Hunffman.
+
+        Falta agregar longitud media de salida, que es la frecuencia de salida
+        por la longitud del caracter. en este caso es:
+            por cada codificacion de cada caracter, se hace una sumatoria de
+            su frecuencia y la longitud de la codifiacion.
+
+        El radio de comprecion es calculado como la divicion entre la longitud
+        media de entrada sobre la longitud media de salida.
     """
 
     # Constructor de clase.
-    def __init__(self):
+    def __init__(self, diccionario):
         # Almacena la id de la raiz, por default es 0
         self.id_raiz = None
 
@@ -31,10 +39,13 @@ class Arbol_Hunffman(object):
         self.total_nodos = 0
 
         # Diccionario de caracteres.
-        self.diccionario = {}
+        self.diccionario = diccionario
 
         # Diccionario de codigos para encriptar.
         self.diccionario_codigos = {}
+
+        # Longitud media de salida.
+        self.longitud_media_salia = 0
 
     # Retorna la codificacion hasta un caracter, esto se hace con el costo
     # de las aristas, dada una ruta a seguir.
@@ -165,8 +176,13 @@ class Arbol_Hunffman(object):
                 )
 
             else:
+                c = self.diccionario[nodo.id_nodo]
+                if c == '\n':
+                    c = 'NUEVA LINEA'
+                elif c == ' ':
+                    c = 'ESPACIO'
                 contenido = '{{'
-                contenido += self.diccionario[nodo.id_nodo]
+                contenido += c
                 contenido += ' | '
                 contenido += str('{}'.format(nodo.contenido))
                 contenido += ' } | '
