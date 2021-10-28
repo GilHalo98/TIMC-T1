@@ -55,57 +55,67 @@ def calcular_frecuencias(texto):
 
 
 # Funcion main.
-def main():
+def main(archivo_entrada=None):
     system('clear')
 
-    try:
-        # req = get('https://loripsum.net/api/10/verylong/plaintext')
-        req = get('https://loripsum.net/api/1/short/plaintext')
+    if archivo_entrada is None:
+        try:
+            # req = get('https://loripsum.net/api/10/verylong/plaintext')
+            req = get('https://loripsum.net/api/1/short/plaintext')
 
-        texto = ''
-        for r in req:
-            texto += r.decode('utf-8')
+            texto = ''
+            for r in req:
+                texto += r.decode('utf-8')
 
-    except Exception:
-        texto = generar_texto_aleatorio(100)
+        except Exception:
+            texto = generar_texto_aleatorio(100)
 
-    print('Texto generado:\n{}\n'.format(texto))
+    else:
+        objeto_archivo = open(archivo_entrada, 'r')
+        texto = objeto_archivo.read()
+        objeto_archivo.close()
+
+    print('Texto generado:\n{}'.format(texto))
 
     frecuencias, diccionario = calcular_frecuencias(texto)
 
-    for id in diccionario:
-        c = diccionario[id]
+    # for id in diccionario:
+    #     c = diccionario[id]
+    #
+    #     if c == '\n':
+    #         c = 'NUEVA LINEA'
+    #     elif c == ' ':
+    #         c = 'ESPACIO'
+    #
+    #     print(id, c, frecuencias[id])
 
-        if c == '\n':
-            c = 'NUEVA LINEA'
-        elif c == ' ':
-            c = 'ESPACIO'
-
-        print(id, c, frecuencias[id])
-
-    arbol = Arbol_Hunffman(diccionario)
-    arbol.generar_arbol(frecuencias)
+    arbol = Arbol_Hunffman(diccionario, frecuencias)
     arbol.graficar('prueba')
 
-    print()
-    for codigo in arbol.codigos():
-        c = diccionario[codigo[0]]
-
-        if c == '\n':
-            c = 'NUEVA LINEA'
-        elif c == ' ':
-            c = 'ESPACIO'
-
-        print(c, codigo[1])
+    # print()
+    # for codigo in arbol.codigos():
+    #     c = diccionario[codigo[0]]
+    #
+    #     if c == '\n':
+    #         c = 'NUEVA LINEA'
+    #     elif c == ' ':
+    #         c = 'ESPACIO'
+    #
+    #     print(c, codigo[1])
 
     texto_encriptado = arbol.encriptar(texto)
-
-    print()
-    print('Texto encriptado:\n{}\n'.format(texto_encriptado))
-    print()
+    print('Texto encriptado (NUEVO):\n{}\n'.format(texto_encriptado))
 
     texto_desencriptado = arbol.desencriptar(texto_encriptado)
-    print('Texto desencriptado:\n{}\n'.format(texto_desencriptado))
+    print('Texto desencriptado (NUEVO):\n{}\n'.format(texto_desencriptado))
+
+    # archivo = open('texto_encriptado.txt', 'w')
+    # archivo.write(texto_encriptado)
+    # archivo.close()
+
+    # archivo = open('texto_desencriptado.txt', 'w')
+    # archivo.write(texto_desencriptado)
+    # archivo.close()
 
 
 if __name__ == "__main__":

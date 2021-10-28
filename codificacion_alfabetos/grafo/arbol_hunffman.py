@@ -24,7 +24,7 @@ class Arbol_Hunffman(object):
     """
 
     # Constructor de clase.
-    def __init__(self, diccionario):
+    def __init__(self, diccionario, frecuencias):
         # Almacena la id de la raiz, por default es 0
         self.id_raiz = None
 
@@ -47,6 +47,21 @@ class Arbol_Hunffman(object):
         # Longitud media de salida.
         self.longitud_media_salia = 0
 
+        # Frecuencias de los caracteres.
+        self.frecuencias = frecuencias
+
+        # Longitud media de salida.
+        self.longitud_media_salida = 0
+
+        # Longitud media de entrada.
+        self.longitud_media_entrada = 0
+
+        # Radio del comprecion del arbol.
+        self.radio_comprecion = 0
+
+        # Genera el arbol canonico de Huffman.
+        self.__generar_arbol()
+
     # Retorna la codificacion hasta un caracter, esto se hace con el costo
     # de las aristas, dada una ruta a seguir.
     def __get_codificacion(self, ruta):
@@ -61,12 +76,12 @@ class Arbol_Hunffman(object):
         return codigo
 
     # Crea el arbol binario desde un diccionario.
-    def generar_arbol(self, frecuencias):
+    def __generar_arbol(self):
         # Agregamos las hojas del arbol.
-        for id in frecuencias:
+        for id in self.frecuencias:
             self.topologia[id] = Nodo(
                 id,
-                frecuencias[id]
+                self.frecuencias[id]
             )
 
             # Aumenta la cantidad de nodos en 1.
@@ -75,7 +90,7 @@ class Arbol_Hunffman(object):
         # Para poder generar el arbol como tal se usa una frontera, pero
         # esta contiene los nodos hojas ya que tecnicamente el arbol de
         # hunffman se contruye de las hojas a la raiz.
-        frontera = list(frecuencias.keys()).copy()
+        frontera = list(self.frecuencias.keys()).copy()
 
         # Mientras que exitan mas de dos nodos por expandir en la
         # frontera.
@@ -84,28 +99,34 @@ class Arbol_Hunffman(object):
             # orden en que se realizan las operaciones es de manera
             # decendente, por eso se ordena de manera decendente la
             # frontera.
-            frontera = sorted(frontera, key=frecuencias.__getitem__)
+            frontera = sorted(frontera, key=self.frecuencias.__getitem__)
 
             # Se asigna un id al valor omega calculado.
             nuevo_id = 'q' + str(self.__id)
 
             # Se almacena el nuevo valor omega en las frecuencias.
-            frecuencias[nuevo_id] = (
-                frecuencias[frontera[0]]
-                + frecuencias[frontera[1]]
+            self.frecuencias[nuevo_id] = (
+                self.frecuencias[frontera[0]]
+                + self.frecuencias[frontera[1]]
             )
 
+            # Dependiendo del valor de la frecuencia del hijo se
+            # selecciona la direccion de conexion.
             if frontera[1] <= frontera[0]:
+                # Si el valor del hijo A es menor que B entonces se
+                # conecta A sobre la izquierda.
                 hi = frontera[1]
                 hd = frontera[0]
+
             else:
+                # Si B es mayor que A, entonces B se conecta a la izquierda.
                 hi = frontera[0]
                 hd = frontera[1]
 
             # Se genera un nuevo nodo conteniendo el nuevo omega.
             self.topologia[nuevo_id] = Nodo(
                 nuevo_id,
-                frecuencias[nuevo_id],
+                self.frecuencias[nuevo_id],
                 hijo_izquierda=hi,
                 hijo_derecha=hd
             )
@@ -131,7 +152,21 @@ class Arbol_Hunffman(object):
 
         # Lo ultimo que queda es generar los codigos del encriptado.
         for id_caracter, codigo in self.codigos():
-            self.diccionario_codigos[self.diccionario[id_caracter]] = codigo
+            self.diccionario_codigos[
+                self.diccionario[id_caracter]
+            ] = codigo
+
+        # Ahora se calcula la frecuencia media de entrada, salida y el
+        # radio del comprecion de arbol canonico.
+
+        # Primer calculamos la frecuencia de entrada.
+        for id in self.frecuencias:
+            frecuencia = self.frecuencias[id]
+            if id in self.diccionario:
+                caracter = self.diccionario[id]
+                codigo = self.diccionario_codigos[caracter]
+                self.longitud_media_salida += len(codigo) * float(frecuencia)
+                # print(caracter, codigo, frecuencia)
 
     # Grafica el arbol de hunffman.
     def graficar(self, archivo_salida):
@@ -176,11 +211,19 @@ class Arbol_Hunffman(object):
                 )
 
             else:
+                # Caracter en cuestion.
                 c = self.diccionario[nodo.id_nodo]
+
+                # Casos para  caracteres especiales.
                 if c == '\n':
+                    # Salto de linea.
                     c = 'NUEVA LINEA'
+
                 elif c == ' ':
+                    # Espacio.
                     c = 'ESPACIO'
+
+                # Grafico de nodo hoja.
                 contenido = '{{'
                 contenido += c
                 contenido += ' | '
@@ -237,44 +280,99 @@ class Arbol_Hunffman(object):
             # Si no es una hoja.
             else:
                 if self.topologia[id_nodo].hijo_izquierda not in visitados:
+                    # Si el hijo en izquierda no esta visitado, el puntero
+                    # se mueve a dicho hijo.
                     id_nodo = self.topologia[id_nodo].hijo_izquierda
+
                 elif self.topologia[id_nodo].hijo_derecha not in visitados:
+                    # Si el hijo sobre la izquierda ya esta visitado, selecciona
+                    # el de la derecha si no esta visitado.
                     id_nodo = self.topologia[id_nodo].hijo_derecha
+
                 else:
-                    # Regresamos una posicion en la ruta.
+                    # Si los dos ya han sido visitados, entonces
+                    # retorna un nodo.
                     id_nodo = ruta.pop()
                     id_nodo = ruta.pop()
 
     # Encripta un texto dado con el arbol de Huffman.
     def encriptar(self, texto):
+        # Texto encriptado en binario.
         texto_encriptado = ''
+
+        # Conteo de bits del byte.
+        conteo_bit = 0
+
+        # Representacion binaria de byte.
+        byte = ''
+
+        # Por cada caracter en el texto.
         for c in texto:
-            texto_encriptado += self.diccionario_codigos[c]
+
+            # Por cada bit en la codificacion del caracter.
+            for bit in self.diccionario_codigos[c]:
+
+                # Si conteo del byte es 8.
+                if conteo_bit == 8:
+                    # Se agrega el byte al texto encriptado.
+                    texto_encriptado += byte
+
+                    # Se agrega el siguiente bit al byte.
+                    byte = bit
+
+                    # El conteo se resetea a 1.
+                    conteo_bit = 1
+
+                # En caso anterior.
+                else:
+                    # Se agrega el bit al byte.
+                    byte += bit
+
+                    # Aumenta el conteo del byte.
+                    conteo_bit += 1
+
+        # Si el ultimo byte no esta completo, no tiene 8 bits,
+        # se agrega.
+        if len(byte) > 0:
+            texto_encriptado += byte
 
         return texto_encriptado
 
     # Desencripta un texto dado con el arbol de Huffman.
     def desencriptar(self, texto_encriptado):
+        # El nodo actual en el que se encuentra el puntero.
         nodo_acutal = self.id_raiz
+
+        # El texto desencriptado.
         texto = ''
-        combinacion = ''
 
+        # Longitud del texto encriptado.
         n = len(texto_encriptado)
-        i = 0
 
+        i = 0
         while i < n:
+            # Por cada bit en el texto encriptado.
             if self.topologia[nodo_acutal].es_hoja():
+                # Si el nodo acual es una hoja, entonces encontramos un
+                # caracter, el caracter se agrega al texto desencriptado.
                 texto += self.diccionario[nodo_acutal]
+
+                # Se retorna el puntero a la raiz del arbol canonico.
                 nodo_acutal = self.id_raiz
+
             else:
-                bit = texto_encriptado[i]
-                combinacion += bit
-                if bit == '1':
+                if texto_encriptado[i] == '1':
+                    # Si el bit actual es 1 se pasa al nodo derecho.
                     nodo_acutal = self.topologia[nodo_acutal].hijo_derecha
+
                 else:
+                    # Si el bit es 0 se pasa al nodo izquierdo.
                     nodo_acutal = self.topologia[nodo_acutal].hijo_izquierda
+
+                # Se mueve al siguiente bit.
                 i += 1
 
+        # Se agrega el ultimo caracter desencriptado.
         texto += self.diccionario[nodo_acutal]
 
         return texto
