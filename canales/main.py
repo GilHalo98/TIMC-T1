@@ -24,8 +24,9 @@ def main():
     # C = ['0000', '1111']
     # C = ['#', '$', '%', '!', '"']
     C = ['!', '##', '$$', '"""', '%%%%']
+    C = ['P', 'E', 'R']
     arbol = Arbol_Combinaciones()
-    arbol.generar_combinaciones(C, 10)
+    arbol.generar_combinaciones(C, 4)
 
     print(arbol)
 
@@ -34,6 +35,7 @@ def main():
         combinaciones += combinacion
         combinaciones += '\n'
 
+    print(combinaciones)
     arbol.graficar('prueba')
 
 
