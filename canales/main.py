@@ -24,9 +24,9 @@ def main():
     # C = ['0000', '1111']
     # C = ['#', '$', '%', '!', '"']
     C = ['!', '##', '$$', '"""', '%%%%']
-    C = ['P', 'E', 'R']
+    # C = ['P', 'E', 'R']
     arbol = Arbol_Combinaciones()
-    arbol.generar_combinaciones(C, 4)
+    arbol.generar_combinaciones(C, 5)
 
     print(arbol)
 
