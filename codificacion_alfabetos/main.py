@@ -60,8 +60,8 @@ def main(archivo_entrada=None):
 
     if archivo_entrada is None:
         try:
-            # req = get('https://loripsum.net/api/10/verylong/plaintext')
-            req = get('https://loripsum.net/api/1/short/plaintext')
+            req = get('https://loripsum.net/api/10/verylong/plaintext')
+            # req = get('https://loripsum.net/api/1/short/plaintext')
 
             texto = ''
             for r in req:
@@ -79,29 +79,40 @@ def main(archivo_entrada=None):
 
     frecuencias, diccionario = calcular_frecuencias(texto)
 
-    # for id in diccionario:
-    #     c = diccionario[id]
-    #
-    #     if c == '\n':
-    #         c = 'NUEVA LINEA'
-    #     elif c == ' ':
-    #         c = 'ESPACIO'
-    #
-    #     print(id, c, frecuencias[id])
+    for id in diccionario:
+        c = diccionario[id]
+        if c == '\n':
+            c = 'NUEVA LINEA'
+        elif c == ' ':
+            c = 'ESPACIO'
+        print(id, c, frecuencias[id])
 
     arbol = Arbol_Hunffman(diccionario, frecuencias)
     arbol.graficar('prueba')
 
-    # print()
-    # for codigo in arbol.codigos():
-    #     c = diccionario[codigo[0]]
-    #
-    #     if c == '\n':
-    #         c = 'NUEVA LINEA'
-    #     elif c == ' ':
-    #         c = 'ESPACIO'
-    #
-    #     print(c, codigo[1])
+    print()
+    for codigo in arbol.codigos():
+        c = diccionario[codigo[0]]
+        if c == '\n':
+            c = 'NUEVA LINEA'
+        elif c == ' ':
+            c = 'ESPACIO'
+        print(c, codigo[1])
+
+    # Se calcula la longitud promedio de caracter por codificación.
+    long_prom = 0
+    for id, codigo in zip(diccionario, arbol.codigos()):
+        frecuencia = frecuencias[id]
+        longitud_codigo = len(str(codigo[1]))
+
+        long_prom += longitud_codigo * frecuencia
+
+    print()
+    print("longitud promedio {}".format(float(long_prom)))
+
+    print()
+    radio_comprecion = 8 / float(long_prom)
+    print('Radio de compreción: {}'.format(radio_comprecion))
 
     texto_encriptado = arbol.encriptar(texto)
     print('Texto encriptado (NUEVO):\n{}\n'.format(texto_encriptado))

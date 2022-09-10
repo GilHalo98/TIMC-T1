@@ -38,12 +38,15 @@ def construir_arbol_sufijo(p):
 # Funcion main.
 def main():
     system('clear')
-    req = get('https://loripsum.net/api/1/short/plaintext')
+    # req = get('https://loripsum.net/api/1/short/plaintext')
 
-    texto = ''
+    '''texto = ''
     for r in req:
         texto += r.decode('utf-8')
-    patron = choice(texto.split(' '))
+    patron = choice(texto.split(' '))'''
+
+    texto = 'ajsdbkajhdkjahjkdhakjshdkjadkjahdkjhakjdhakjhdkjahdkjhakjsdh'
+    patron = 'jkd'
 
     coincidencias = [id for id in kmp(texto, patron)]
 

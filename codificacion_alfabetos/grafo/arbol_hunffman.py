@@ -14,13 +14,13 @@ class Arbol_Hunffman(object):
     """
         Arbol binario extendido para usarse como un arbol de Hunffman.
 
-        Falta agregar longitud media de salida, que es la frecuencia de salida
-        por la longitud del caracter. en este caso es:
-            por cada codificacion de cada caracter, se hace una sumatoria de
-            su frecuencia y la longitud de la codifiacion.
+        Falta agregar longitud media de salida, que es la frecuencia de
+        salida por la longitud del caracter. en este caso es:
+            por cada codificacion de cada caracter, se hace una
+            sumatoria de su frecuencia y la longitud de la codifiacion.
 
-        El radio de comprecion es calculado como la divicion entre la longitud
-        media de entrada sobre la longitud media de salida.
+        El radio de comprecion es calculado como la divicion entre la
+        longitud media de entrada sobre la longitud media de salida.
     """
 
     # Constructor de clase.
@@ -62,8 +62,8 @@ class Arbol_Hunffman(object):
         # Genera el arbol canonico de Huffman.
         self.__generar_arbol()
 
-    # Retorna la codificacion hasta un caracter, esto se hace con el costo
-    # de las aristas, dada una ruta a seguir.
+    # Retorna la codificacion hasta un caracter, esto se hace con el
+    # costo de las aristas, dada una ruta a seguir.
     def __get_codificacion(self, ruta):
         codigo = ''
 
@@ -119,7 +119,8 @@ class Arbol_Hunffman(object):
                 hd = frontera[0]
 
             else:
-                # Si B es mayor que A, entonces B se conecta a la izquierda.
+                # Si B es mayor que A, entonces B se conecta a la
+                # izquierda.
                 hi = frontera[0]
                 hd = frontera[1]
 
@@ -188,7 +189,8 @@ class Arbol_Hunffman(object):
 
         # Por cada nodo en el arbol.
         for nodo in nodos:
-            # Si el nodo no es una hoja, se agrega el vertice de los hijos.
+            # Si el nodo no es una hoja, se agrega el vertice de
+            # los hijos.
             if not nodo.es_hoja():
                 # Se agrega el nodo en el grafico.
                 grafico.node(
@@ -267,8 +269,9 @@ class Arbol_Hunffman(object):
                 visitados.append(id_nodo)
                 total_visitados += 1
 
-            # En este punto, si el nodo es una hoja, retorna la codificacion
-            # del caracter, para esto se usa la ruta y el peso de las aristas.
+            # En este punto, si el nodo es una hoja, retorna la
+            # codificacion del caracter, para esto se usa la ruta y el
+            # peso de las aristas.
             if self.topologia[id_nodo].es_hoja():
                 # Se usan generadores para que no genere tanta memoria.
                 yield id_nodo, self.__get_codificacion(ruta)
@@ -280,13 +283,13 @@ class Arbol_Hunffman(object):
             # Si no es una hoja.
             else:
                 if self.topologia[id_nodo].hijo_izquierda not in visitados:
-                    # Si el hijo en izquierda no esta visitado, el puntero
-                    # se mueve a dicho hijo.
+                    # Si el hijo en izquierda no esta visitado, el
+                    # puntero se mueve a dicho hijo.
                     id_nodo = self.topologia[id_nodo].hijo_izquierda
 
                 elif self.topologia[id_nodo].hijo_derecha not in visitados:
-                    # Si el hijo sobre la izquierda ya esta visitado, selecciona
-                    # el de la derecha si no esta visitado.
+                    # Si el hijo sobre la izquierda ya esta visitado,
+                    # selecciona el de la derecha si no esta visitado.
                     id_nodo = self.topologia[id_nodo].hijo_derecha
 
                 else:

@@ -245,11 +245,12 @@ def main(instancia=None, operacion=''):
 
         b = time.perf_counter()
 
+        print('---> Instancia cargada en {0:.2f}s'.format(b - a))
+
     else:
         datos, tipo_operacion = data_input()
         system('clear')
 
-    print('---> Instancia cargada en {0:.2f}s'.format(b - a))
     print('\n{}\n'.format(datos))
 
     cantidad_datos = 1
