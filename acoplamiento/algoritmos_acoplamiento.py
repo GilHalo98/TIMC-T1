@@ -1,5 +1,16 @@
+'''
+    Libro El Quijote o el de anna frank
+    mitad del libro boyer_moore y la otra mitad KMP
+    Patrones de busqueda, "con" y "sin"
+
+    Cantida de coincidencias y posicion de las coincidencias
+'''
+
 # Algoritmo Boyer-Moore.
 def boyer_moore(t, p):
+    '''
+        Programarlo con un log de las acciones que el algoritmo realiza.
+    '''    
     n = len(t)
     m = len(p)
 
