@@ -35,6 +35,9 @@ def cargar_instancia_csv(
     # Cargamos la instancia del .csv por medio de numpy.
     datos = np.genfromtxt(directorio, delimiter=',')
 
+    # Aquellos valores con frecuencias 0 o menor se omiten.
+    datos = datos[datos > 0]
+
     # Si la instancia es una matriz, creamos un dataframe.
     if len(datos.shape) > 1:
         # Creamos el dataframe que contenga los datos.

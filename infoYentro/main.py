@@ -148,6 +148,9 @@ def main(con_args: argparse.Namespace, *args, **kargs) -> None:
         # Aquellos valores con frecuencias 0 se omiten.
         aux_frecuencias = aux_frecuencias[aux_frecuencias != 0]
 
+        # Aquellos valores con frecuencias 0 se omiten.
+        aux_frecuencias = aux_frecuencias[aux_frecuencias != -1]
+
         # Asignamos nuevos ids
         valores = {}
         i = 0
