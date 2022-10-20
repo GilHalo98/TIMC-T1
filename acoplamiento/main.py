@@ -17,7 +17,7 @@ from requests import get
 from random import choice
 
 # Librerias propias
-from algoritmos_acoplamiento import kmp
+from algoritmos_acoplamiento import kmp, boyer_moore
 
 
 # Aplica un arbol de sufijos.
@@ -45,8 +45,11 @@ def main():
         texto += r.decode('utf-8')
     patron = choice(texto.split(' '))'''
 
-    texto = 'ajsdbkajhdkjahjkdhakjshdkjadkjahdkjhakjdhakjhdkjahdkjhakjsdh'
-    patron = 'jkd'
+    texto =  '01110001000'
+    patron = '111111'
+
+    print('texto: {}'.format(texto))
+    print('patron: {}'.format(patron))
 
     coincidencias = [id for id in kmp(texto, patron)]
 
