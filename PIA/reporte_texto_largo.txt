@@ -1,0 +1,85 @@
+Texto:
+ï»¿Lorem ipsum dolor sit amet, consectetur adipiscing elit. Istam voluptatem perpetuam quis potest praestare sapienti? Et nemo nimium beatus est; Ita prorsus, inquam; Etiam beatissimum? 
+Total de caracteres en el texto: 186
+Secreto:
+00011011
+Total de bits en el secreto: 8
+Alfabeto:
+h    S0
+o    S1
+l    S2
+a    S3
+Frecuencias:
+S0    0.25
+S1    0.25
+S2    0.25
+S3    0.25
+N0    0.50
+N1    0.50
+N2    1.00
+Tabla de codificacion derecha:
+d      1000000
+E      1000001
+q      1000010
+?      1000011
+o        10001
+b      1001000
+;      1001001
+,      1001010
+.     10010110
+ï    100101111
+p        10011
+t         1010
+u        10110
+c      1011100
+v     10111010
+»    101110110
+g    101110111
+n       101111
+          1100
+m        11010
+a        11011
+s        11100
+i        11101
+l      1111000
+L    111100100
+¿    111100101
+I     11110011
+r       111101
+e        11111
+Tabla de codificacion izquierda:
+d       0000000
+E       0000001
+q       0000010
+?       0000011
+o         00001
+b       0001000
+;       0001001
+,       0001010
+.      00010110
+ES    000101110
+ï     000101111
+p         00011
+t          0010
+u         00110
+c       0011100
+v      00111010
+»     001110110
+g     001110111
+n        001111
+           0100
+m         01010
+a         01011
+s         01100
+i         01101
+l       0111000
+L     011100100
+¿     011100101
+I      01110011
+r        011101
+e         01111
+Tiempo de codificacion del secreto: 0.17s
+Tiempo de analisis del texto: 0.15s
+Tiempo de generacion de tablas: 0.78s
+Tiempo de codificacion del texto: 0.01s
+Tiempo de decodificacion del codigo: 0.01s

@@ -192,6 +192,7 @@ def main(con_args: argparse.Namespace, *args, **kargs) -> None:
     msj += unidades
     print(msj)
 
+
 if __name__ == "__main__":
     # Limpiamos la consola.
     os.system('clear')

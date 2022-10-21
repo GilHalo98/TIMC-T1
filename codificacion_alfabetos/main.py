@@ -9,125 +9,142 @@
 
 
 # Librerias estandar.
-import sys
-import random
-import fractions
-from os import system
+import os
+import argparse
 from requests import get
 
-# Libreria propia
-from grafo.arbol_hunffman import Arbol_Hunffman
+# Librerias de terceros.
+from simhash import Simhash
+
+# Librerias propias.
+from util.funciones import pre_analisis
+from util.archivos import cargar_archivo
+from esquema.huffman import Huffman_Jerarquico, Huffman_Balanceado
+from esquema.estadisticos import Shannon
 
 
-# Genera un texto aleatorio, con una longitud N.
-def generar_texto_aleatorio(longitud):
-    texto = ''
+# Formatea los argumentos pasados por consola.
+def format_args() -> argparse.Namespace:
+    args_parser = argparse.ArgumentParser(
+        description='Programa principal de Información mutua y entropia'
+    )
 
-    caracteres = [
-        c for c in 'abcdefghijklmnñopqrstuvwxyz'
-    ]
+    args_parser.add_argument(
+        '--archivo',
+        default=None,
+        help='Nombre del archivo',
+        dest='dir_archivo',
+        type=str,
+    )
 
-    for _ in range(longitud):
-        texto += random.choice(caracteres)
+    args_parser.add_argument(
+        '--reporte',
+        default=None,
+        help='Nombre del archivo del reporte de salida',
+        dest='dir_reporte',
+        type=str
+    )
 
-    return texto
+    args = args_parser.parse_args()
 
-
-# Calcula las frecuencas de los caracteres dado un texto.
-def calcular_frecuencias(texto):
-    n = len(texto)
-    frecuencias = {}
-    diccionario = {}
-
-    id = 0
-    for caracter in texto:
-        if caracter not in diccionario.values():
-            id_c = 'S{}'.format(id)
-            diccionario[id_c] = caracter
-            frecuencias[id_c] = fractions.Fraction(1, n)
-            id += 1
-        else:
-            id_c = list(diccionario.values()).index(caracter)
-            id_c = list(diccionario.keys())[id_c]
-            frecuencias[id_c] += fractions.Fraction(1, n)
-
-    return frecuencias, diccionario
+    return args
 
 
 # Funcion main.
-def main(archivo_entrada=None):
-    system('clear')
+def main(con_args: argparse.Namespace, *args, **kargs):
+    # Recuperamos los parametros pasados por consola.
+    dir_archivo: str = con_args.dir_archivo
+    dir_reporte: str = con_args.dir_reporte
 
-    if archivo_entrada is None:
-        try:
-            req = get('https://loripsum.net/api/10/verylong/plaintext')
-            # req = get('https://loripsum.net/api/1/short/plaintext')
+    # Cargamos el archivo a comprimir.
+    texto = cargar_archivo(dir_archivo)
 
-            texto = ''
-            for r in req:
-                texto += r.decode('utf-8')
+    print('---> Texto Cargado')
+    if len(texto) < 100:
+        print(texto)
+    else:
+        print(texto[:100] + '...')
+    print()
 
-        except Exception:
-            texto = generar_texto_aleatorio(100)
+    print('---> Pre-Análisis realizado')
+    alfabeto, frecuencias = pre_analisis(texto)
+
+    print('---> Alfabeto')
+    print(alfabeto)
+    print()
+
+    print('---> Frecuencias')
+    print(frecuencias)
+    print()
+
+    # Instanciamos el esquema a usar.
+    huffman = Shannon(
+        alfabeto,
+        frecuencias,
+        len(texto)
+    )
+
+    print('---> Generando tabla de codificacion')
+    huffman.generar_tabla_codigos()
+    print(huffman.tabla_codificacion)
+    print()
+
+    print('---> Generando reporte')
+    huffman.generar_reporte(dir_reporte)
+    print()
+
+    print('---> Codificacion de texto')
+    texto_input = 'Μνω'
+    texto_codificado = huffman.codificar(texto_input)
+    if len(texto_codificado) < 100:
+        print(texto_codificado)
+    else:
+        print(texto_codificado[:100] + '...')
+    print()
+
+    print('---> Decodificacion de texto')
+    texto_decodificado = huffman.decodificar(texto_codificado)
+    if len(texto_decodificado) < 100:
+        print(texto_decodificado)
+    else:
+        print(texto_decodificado[:100] + '...')
+    print()
+
+    print('---> Verificando hash del texto')
+    hash_original = Simhash(texto_input).value
+    hash_decodificado = Simhash(texto_decodificado).value
+
+    if hash_original == hash_decodificado:
+        print('---> El texto original coincide con el decodificado')
+
+        # Creamos el archivo del reporte.
+        with open(
+            dir_reporte + '_texto_codificado.txt',
+            'w+',
+            encoding='utf-8'
+        ) as objeto_archivo:
+            objeto_archivo.write(texto_codificado)
 
     else:
-        objeto_archivo = open(archivo_entrada, 'r')
-        texto = objeto_archivo.read()
-        objeto_archivo.close()
-
-    print('Texto generado:\n{}'.format(texto))
-
-    frecuencias, diccionario = calcular_frecuencias(texto)
-
-    for id in diccionario:
-        c = diccionario[id]
-        if c == '\n':
-            c = 'NUEVA LINEA'
-        elif c == ' ':
-            c = 'ESPACIO'
-        print(id, c, frecuencias[id])
-
-    arbol = Arbol_Hunffman(diccionario, frecuencias)
-    arbol.graficar('prueba')
-
-    print()
-    for codigo in arbol.codigos():
-        c = diccionario[codigo[0]]
-        if c == '\n':
-            c = 'NUEVA LINEA'
-        elif c == ' ':
-            c = 'ESPACIO'
-        print(c, codigo[1])
-
-    # Se calcula la longitud promedio de caracter por codificación.
-    long_prom = 0
-    for id, codigo in zip(diccionario, arbol.codigos()):
-        frecuencia = frecuencias[id]
-        longitud_codigo = len(str(codigo[1]))
-
-        long_prom += longitud_codigo * frecuencia
-
-    print()
-    print("longitud promedio {}".format(float(long_prom)))
-
-    print()
-    radio_comprecion = 8 / float(long_prom)
-    print('Radio de compreción: {}'.format(radio_comprecion))
-
-    texto_encriptado = arbol.encriptar(texto)
-    print('Texto encriptado (NUEVO):\n{}\n'.format(texto_encriptado))
-
-    texto_desencriptado = arbol.desencriptar(texto_encriptado)
-    print('Texto desencriptado (NUEVO):\n{}\n'.format(texto_desencriptado))
-
-    # archivo = open('texto_encriptado.txt', 'w')
-    # archivo.write(texto_encriptado)
-    # archivo.close()
-
-    # archivo = open('texto_desencriptado.txt', 'w')
-    # archivo.write(texto_desencriptado)
-    # archivo.close()
+        raise Exception(
+            '---> Error: El texto codificado es distinto del original'
+            + '\n---> Hash del original {}'.format(hash_original)
+            + '\n---> Hash del decodificado {}'.format(hash_decodificado)
+        )
 
 
 if __name__ == "__main__":
-    main(*sys.argv[1:])
+    # Limpiamos la consola.
+    os.system('clear')
+
+    # Formateamos los parametros pasados por consola.
+    con_args = format_args()
+
+    if con_args.dir_archivo is None or con_args.dir_reporte is None:
+        raise Exception(
+            '---> Es necesario agregar los argumentos'
+            + ' ingregar -h para mayor informacion'
+        )
+
+    # Ejecutamo la funcion main.
+    main(con_args)
